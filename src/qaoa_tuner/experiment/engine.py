@@ -64,6 +64,12 @@ class ExperimentEngine:
         if graph.num_nodes <= 12 and classical_satisfiable:
             classical_ground_colorings = find_all_valid_colorings(graph, config.num_colors)
 
+        # Resolve noise model if specified
+        noise_model = None
+        if config.noise_model_name and config.noise_model_name.lower() not in ["none", "ideal"]:
+            from qaoa_tuner.noise.models import build_noise_model
+            noise_model = build_noise_model(config.noise_model_name)
+
         # 3. QAOA Optimization
         runner = QaoaRunner(
             graph=graph,
@@ -71,6 +77,7 @@ class ExperimentEngine:
             p=config.qaoa_p,
             shots=config.shots,
             seed=config.seed,
+            noise_model=noise_model,
         )
 
         exec_res = runner.optimize(

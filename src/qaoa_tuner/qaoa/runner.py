@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
 import numpy as np
 from qiskit import transpile
@@ -56,6 +57,7 @@ class QaoaRunner:
         seed: int | None = 42,
         penalty_vertex: float = 2.0,
         penalty_edge: float = 1.0,
+        noise_model: Any | None = None,
     ) -> None:
         """Initialize QAOA runner for a given graph and depth.
 
@@ -67,6 +69,7 @@ class QaoaRunner:
             seed: Random seed for simulation reproducibility.
             penalty_vertex: Vertex constraint weight A.
             penalty_edge: Edge conflict constraint weight B.
+            noise_model: Optional Qiskit Aer NoiseModel for noisy simulation.
         """
         if p < 1:
             raise ValueError(f"QAOA depth p must be >= 1, got {p}.")
@@ -78,6 +81,7 @@ class QaoaRunner:
         self.p = p
         self.shots = shots
         self.seed = seed
+        self.noise_model = noise_model
 
         self.cost_hamiltonian = build_cost_hamiltonian(
             graph=graph,
@@ -92,7 +96,7 @@ class QaoaRunner:
             measure=True,
         )
 
-        self.simulator = AerSimulator(seed_simulator=seed)
+        self.simulator = AerSimulator(noise_model=noise_model, seed_simulator=seed)
         # Transpile once to the simulator target to ensure optimal gate set execution
         self._compiled_template = transpile(self.circuit, self.simulator)
 
