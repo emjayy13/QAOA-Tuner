@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from qaoa_tuner.compilation.profiler import CircuitResourceMetrics
 from qaoa_tuner.experiment.config import ExperimentConfig
 from qaoa_tuner.experiment.metrics import ExecutionMetrics, SolutionMetrics
 
@@ -24,6 +25,8 @@ class ExperimentResult:
         optimization_history: Trace of objective values across optimization steps.
         measurement_counts: Raw final measurement histogram {bitstring: count}.
         measurement_probabilities: Normalized probabilities {bitstring: probability}.
+        circuit_metrics: Compiled hardware resource metrics (depth, 2Q gates, SWAPs).
+        logical_metrics: Original uncompiled circuit resource metrics.
     """
 
     config: ExperimentConfig
@@ -34,6 +37,8 @@ class ExperimentResult:
     optimization_history: list[float]
     measurement_counts: dict[str, int]
     measurement_probabilities: dict[str, float]
+    circuit_metrics: CircuitResourceMetrics | None = None
+    logical_metrics: CircuitResourceMetrics | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """Convert entire experiment result to a nested JSON-compatible dictionary."""
@@ -46,11 +51,23 @@ class ExperimentResult:
             "optimization_history": self.optimization_history,
             "measurement_counts": self.measurement_counts,
             "measurement_probabilities": self.measurement_probabilities,
+            "circuit_metrics": self.circuit_metrics.to_dict() if self.circuit_metrics else None,
+            "logical_metrics": self.logical_metrics.to_dict() if self.logical_metrics else None,
         }
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> ExperimentResult:
         """Construct an ExperimentResult from a nested dictionary."""
+        circ_m = (
+            CircuitResourceMetrics.from_dict(data["circuit_metrics"])
+            if data.get("circuit_metrics")
+            else None
+        )
+        log_m = (
+            CircuitResourceMetrics.from_dict(data["logical_metrics"])
+            if data.get("logical_metrics")
+            else None
+        )
         return cls(
             config=ExperimentConfig.from_dict(data["config"]),
             solution_metrics=SolutionMetrics.from_dict(data["solution_metrics"]),
@@ -60,6 +77,8 @@ class ExperimentResult:
             optimization_history=data["optimization_history"],
             measurement_counts=data["measurement_counts"],
             measurement_probabilities=data["measurement_probabilities"],
+            circuit_metrics=circ_m,
+            logical_metrics=log_m,
         )
 
     def to_json(self, indent: int = 2) -> str:

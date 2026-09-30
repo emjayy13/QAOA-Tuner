@@ -9,6 +9,8 @@ from pathlib import Path
 import qiskit
 import qiskit_aer
 
+from qaoa_tuner.compilation.backends import BackendProvider
+from qaoa_tuner.compilation.transpiler import transpile_qaoa_circuit
 from qaoa_tuner.experiment.config import ExperimentConfig
 from qaoa_tuner.experiment.metrics import ExecutionMetrics, SolutionMetrics
 from qaoa_tuner.experiment.result import ExperimentResult
@@ -38,7 +40,7 @@ class ExperimentEngine:
             1. Reconstruct and validate graph topology.
             2. Compute classical ground truth (chromatic number, exact solvability).
             3. Execute QAOA circuit generation, transpilation, and parameter optimization.
-            4. Extract solution quality, overlap with classical ground states, and execution resources.
+            4. Extract solution quality, hardware resource overhead, and execution metrics.
             5. Return structured, immutable ExperimentResult.
 
         Args:
@@ -82,7 +84,21 @@ class ExperimentEngine:
         decoded = exec_res.decoded_result
         opt_res = exec_res.optimizer_result
 
-        # 4. Compute ground-state overlap
+        # 4. Hardware-aware Transpilation Profiling
+        backend = BackendProvider.get_backend(
+            name=config.backend_name,
+            num_qubits=max(graph.num_nodes, 5),
+            seed=config.seed or 42,
+        )
+
+        transpile_res = transpile_qaoa_circuit(
+            circuit=exec_res.optimal_circuit,
+            backend=backend,
+            optimization_level=config.transpiler_optimization_level,
+            seed_transpiler=config.seed or 42,
+        )
+
+        # 5. Compute ground-state overlap
         ground_overlap = 0.0
         if classical_ground_colorings:
             for bs, prob in decoded.probabilities.items():
@@ -92,7 +108,7 @@ class ExperimentEngine:
                 if bs_coloring in classical_ground_colorings:
                     ground_overlap += prob
 
-        # 5. Build structured metrics
+        # 6. Build structured metrics
         sol_metrics = SolutionMetrics(
             valid_coloring_rate=decoded.valid_coloring_probability,
             best_coloring=decoded.best_coloring,
@@ -126,6 +142,8 @@ class ExperimentEngine:
             optimization_history=opt_res.history,
             measurement_counts=decoded.counts,
             measurement_probabilities=decoded.probabilities,
+            circuit_metrics=transpile_res.transpiled_metrics,
+            logical_metrics=transpile_res.logical_metrics,
         )
 
     def run_and_save(
