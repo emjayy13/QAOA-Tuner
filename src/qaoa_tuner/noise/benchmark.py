@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+import uuid
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
@@ -63,33 +64,29 @@ def compare_ideal_vs_noisy(
 
     engine = ExperimentEngine()
 
+    # Both runs are derived from the caller's config with dataclasses.replace, so every
+    # other setting (transpiler level, initial point, seed, metadata, ...) is preserved.
+    def _new_id() -> str:
+        return str(uuid.uuid4())[:8]
+
     # 1. Ideal Execution
-    ideal_cfg = ExperimentConfig(
-        graph_dict=config.graph_dict,
-        num_colors=config.num_colors,
-        qaoa_p=config.qaoa_p,
-        optimizer=config.optimizer,
-        max_iter=config.max_iter,
-        shots=config.shots,
+    ideal_cfg = replace(
+        config,
         backend_name="aer_simulator_ideal",
         noise_model_name=None,
-        seed=config.seed,
+        mitigation_method="none",
         name=f"{config.name}_ideal",
+        experiment_id=_new_id(),
     )
     ideal_res = engine.run(ideal_cfg)
 
     # 2. Noisy Execution
-    noisy_cfg = ExperimentConfig(
-        graph_dict=config.graph_dict,
-        num_colors=config.num_colors,
-        qaoa_p=config.qaoa_p,
-        optimizer=config.optimizer,
-        max_iter=config.max_iter,
-        shots=config.shots,
-        backend_name=config.backend_name,
+    noisy_cfg = replace(
+        config,
         noise_model_name=p_name,
-        seed=config.seed,
+        mitigation_method="none",
         name=f"{config.name}_noisy_{p_name}",
+        experiment_id=_new_id(),
     )
     noisy_res = engine.run(noisy_cfg)
 

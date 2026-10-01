@@ -1,0 +1,176 @@
+{
+  "config": {
+    "graph_dict": {
+      "name": "cycle_4",
+      "num_nodes": 4,
+      "edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          3
+        ]
+      ]
+    },
+    "num_colors": 2,
+    "qaoa_p": 1,
+    "optimizer": "COBYLA",
+    "max_iter": 25,
+    "shots": 2048,
+    "experiment_id": "0fecacea",
+    "name": "cycle_4_k2_p1_cobyla_realistic_superconducting",
+    "backend_name": "aer_simulator_ideal",
+    "transpiler_optimization_level": 1,
+    "noise_model_name": null,
+    "mitigation_method": "none",
+    "seed": 42,
+    "initial_point": null,
+    "metadata": {}
+  },
+  "noise_profile": {
+    "name": "realistic_superconducting",
+    "p1_error": 0.0008,
+    "p2_error": 0.01,
+    "readout_error_0to1": 0.015,
+    "readout_error_1to0": 0.015,
+    "enable_thermal_relaxation": true,
+    "t1": 5e-05,
+    "t2": 7e-05,
+    "gate_time_1q": 3.5e-08,
+    "gate_time_2q": 3e-07
+  },
+  "optimal_point": [
+    2.3671537594358023,
+    1.973251887774604
+  ],
+  "training": {
+    "trained_on": "ideal simulator",
+    "optimizer": "COBYLA",
+    "evaluations": 25,
+    "final_objective_value": 0.998046875
+  },
+  "stages": {
+    "ideal": {
+      "label": "ideal",
+      "valid_coloring_rate": 0.5302734375,
+      "expected_conflicts": 0.998046875,
+      "valid_rate_std_error": 0.011028273301061108,
+      "shots_per_circuit": 2048,
+      "extra_circuits": 0,
+      "extra_shots": 0,
+      "max_two_qubit_gates_per_circuit": 4,
+      "wall_time_seconds": 0.6182313999997859,
+      "notes": "Noise-free simulator; also where parameters were trained."
+    },
+    "noisy": {
+      "label": "noisy",
+      "valid_coloring_rate": 0.47802734375,
+      "expected_conflicts": 1.1005859375,
+      "valid_rate_std_error": 0.011037869879342683,
+      "shots_per_circuit": 2048,
+      "extra_circuits": 0,
+      "extra_shots": 0,
+      "max_two_qubit_gates_per_circuit": 4,
+      "wall_time_seconds": 0.08623889999944367,
+      "notes": "Noise profile 'realistic_superconducting'; unmitigated baseline."
+    },
+    "readout": {
+      "label": "noisy+readout",
+      "valid_coloring_rate": 0.50732421875,
+      "expected_conflicts": 1.0400390625,
+      "valid_rate_std_error": null,
+      "shots_per_circuit": 2048,
+      "extra_circuits": 2,
+      "extra_shots": 4096,
+      "max_two_qubit_gates_per_circuit": 4,
+      "wall_time_seconds": 0.08444760000020324,
+      "notes": "Reuses the noisy counts; only calibration is extra (tensored calibrator, condition number 1.139). Gate noise is not corrected."
+    },
+    "zne": {
+      "label": "noisy+zne",
+      "valid_coloring_rate": 0.4937337239583335,
+      "expected_conflicts": 1.0686035156250004,
+      "valid_rate_std_error": 0.01330116172223557,
+      "shots_per_circuit": 2048,
+      "extra_circuits": 2,
+      "extra_shots": 4096,
+      "max_two_qubit_gates_per_circuit": 20,
+      "wall_time_seconds": 0.07635690000006434,
+      "notes": "Extrapolated scalar metrics only (no mitigated distribution). Folds two-qubit gates only; scales [1, 3, 5], model=linear."
+    }
+  },
+  "readout_calibration": {
+    "method": "tensored",
+    "num_qubits": 4,
+    "calibration_circuits": 2,
+    "calibration_shots_total": 4096,
+    "condition_number": 1.1388288222282459
+  },
+  "zne_valid_rate_fit": {
+    "scale_factors": [
+      1.0,
+      3.0,
+      5.0
+    ],
+    "scaled_values": [
+      0.47802734375,
+      0.443359375,
+      0.41259765625
+    ],
+    "extrapolated_zero_noise_value": 0.4937337239583335,
+    "fit_model": "linear",
+    "fit_coefficients": [
+      0.4937337239583335,
+      -0.016357421875000028
+    ],
+    "circuit_multiplier": 3,
+    "noise_scale_sum": 9.0,
+    "extrapolated_std_error": 0.01330116172223557
+  },
+  "zne_conflicts_fit": {
+    "scale_factors": [
+      1.0,
+      3.0,
+      5.0
+    ],
+    "scaled_values": [
+      1.1005859375,
+      1.171875,
+      1.234375
+    ],
+    "extrapolated_zero_noise_value": 1.0686035156250004,
+    "fit_model": "linear",
+    "fit_coefficients": [
+      1.0686035156250004,
+      0.033447265624999965
+    ],
+    "circuit_multiplier": 3,
+    "noise_scale_sum": 9.0,
+    "extrapolated_std_error": null
+  },
+  "zne_valid_rate_unclipped": 0.4937337239583335,
+  "derived": {
+    "degradation_abs": 0.05224609375,
+    "degradation_rel": 0.09852670349907919,
+    "degradation_in_noisy_std_errors": 4.7333493075306405,
+    "readout_improvement_abs": 0.029296875,
+    "zne_improvement_abs": 0.01570638020833348,
+    "readout_recovered_fraction": 0.5607476635514018,
+    "zne_recovered_fraction": 0.30062305295950437
+  },
+  "software": {
+    "python": "3.13.9",
+    "qiskit": "2.2.3",
+    "qiskit_aer": "0.17.2"
+  }
+}

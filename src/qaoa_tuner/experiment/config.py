@@ -55,6 +55,11 @@ class ExperimentConfig:
             raise ValueError(f"qaoa_p must be >= 1, got {self.qaoa_p}")
         if self.optimizer.upper() not in ["COBYLA", "SPSA"]:
             raise ValueError(f"Unsupported optimizer: '{self.optimizer}'")
+        if self.mitigation_method.lower() not in ["none", "readout", "zne"]:
+            raise ValueError(
+                f"mitigation_method must be one of 'none', 'readout', 'zne', "
+                f"got '{self.mitigation_method}'"
+            )
         if self.transpiler_optimization_level not in [0, 1, 2, 3]:
             raise ValueError(
                 f"transpiler_optimization_level must be in [0, 1, 2, 3], got {self.transpiler_optimization_level}"
