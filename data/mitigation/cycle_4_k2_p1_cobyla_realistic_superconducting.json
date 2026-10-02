@@ -27,7 +27,7 @@
     "optimizer": "COBYLA",
     "max_iter": 25,
     "shots": 2048,
-    "experiment_id": "0fecacea",
+    "experiment_id": "239266db",
     "name": "cycle_4_k2_p1_cobyla_realistic_superconducting",
     "backend_name": "aer_simulator_ideal",
     "transpiler_optimization_level": 1,
@@ -69,7 +69,7 @@
       "extra_circuits": 0,
       "extra_shots": 0,
       "max_two_qubit_gates_per_circuit": 4,
-      "wall_time_seconds": 0.6182313999997859,
+      "wall_time_seconds": 9.874698200001149,
       "notes": "Noise-free simulator; also where parameters were trained."
     },
     "noisy": {
@@ -81,7 +81,7 @@
       "extra_circuits": 0,
       "extra_shots": 0,
       "max_two_qubit_gates_per_circuit": 4,
-      "wall_time_seconds": 0.08623889999944367,
+      "wall_time_seconds": 1.172931500004779,
       "notes": "Noise profile 'realistic_superconducting'; unmitigated baseline."
     },
     "readout": {
@@ -93,7 +93,7 @@
       "extra_circuits": 2,
       "extra_shots": 4096,
       "max_two_qubit_gates_per_circuit": 4,
-      "wall_time_seconds": 0.08444760000020324,
+      "wall_time_seconds": 0.41458350000175415,
       "notes": "Reuses the noisy counts; only calibration is extra (tensored calibrator, condition number 1.139). Gate noise is not corrected."
     },
     "zne": {
@@ -105,7 +105,7 @@
       "extra_circuits": 2,
       "extra_shots": 4096,
       "max_two_qubit_gates_per_circuit": 20,
-      "wall_time_seconds": 0.07635690000006434,
+      "wall_time_seconds": 0.436348099996394,
       "notes": "Extrapolated scalar metrics only (no mitigated distribution). Folds two-qubit gates only; scales [1, 3, 5], model=linear."
     }
   },
