@@ -45,3 +45,5 @@ htmlcov/
 data/experiments/
 data/cache/
 *.log
+
+pytest_output.txt
