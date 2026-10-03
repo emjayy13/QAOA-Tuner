@@ -334,3 +334,50 @@ def test_ideal_noise_profile_rejected():
     settings = TunerSettings(graph_dict=create_cycle_graph(4).to_dict(), noise_profile="ideal")
     with pytest.raises(ValueError, match="no noise"):
         ConfigurationEvaluator(settings)
+
+
+# ------------------------------------------------- phase 8: saved results + recommendations ----
+
+
+def test_result_json_round_trip(tiny_result, tmp_path):
+    from qaoa_tuner.tuner.results import TunerResult
+
+    loaded = TunerResult.load_json(tiny_result.save_json(tmp_path / "r.json"))
+    assert loaded.records == tiny_result.records
+    assert loaded.settings["seed"] == tiny_result.settings["seed"]
+    assert [g.representative.label for g in loaded.pareto_groups()] == [
+        g.representative.label for g in tiny_result.pareto_groups()
+    ]
+
+
+def test_recommendations_from_a_real_tuning_run(tiny_result):
+    from qaoa_tuner.recommendation import recommend
+
+    report = recommend(tiny_result)
+    assert report.status == "ok"
+    frontier = {r.label for r in tiny_result.pareto_records()}
+    best = max(r.valid_coloring_rate for r in tiny_result.records)
+    assert report.best_valid_coloring_rate == best
+    for rec in report.recommendations:
+        assert rec.label in frontier
+        assert rec.metrics["valid_coloring_rate"] >= report.quality_floor
+    low, high = report.get("low_cost"), report.get("high_quality")
+    assert high.metrics["valid_coloring_rate"] == best
+    assert low.metrics["two_qubit_gate_budget"] <= high.metrics["two_qubit_gate_budget"]
+
+
+def test_recommendation_cli_end_to_end_and_missing_file(tiny_result, tmp_path, monkeypatch, capsys):
+    import sys
+
+    from qaoa_tuner.recommendation.__main__ import main
+
+    path = tiny_result.save_json(tmp_path / "r.json")
+    report_path = tmp_path / "rep.json"
+    monkeypatch.setattr(sys, "argv", ["prog", str(path), "--save", str(report_path)])
+    assert main() == 0
+    assert "[HIGH QUALITY]" in capsys.readouterr().out
+    assert report_path.is_file()
+
+    monkeypatch.setattr(sys, "argv", ["prog", str(tmp_path / "missing.json")])
+    assert main() == 2
+    assert "File not found" in capsys.readouterr().err

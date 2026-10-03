@@ -226,7 +226,7 @@
       "equivalent_labels": []
     }
   ],
-  "wall_time_seconds": 6.000267700001132,
+  "wall_time_seconds": 4.781623699993361,
   "software": {
     "python": "3.13.9",
     "qiskit": "2.2.3",

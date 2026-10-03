@@ -71,7 +71,7 @@ def main() -> int:
     tuner = ConfigurationTuner(settings, space, objectives=objectives, tolerance=tolerance)
 
     total = space.size
-    print(f"Evaluating {total} configurations (this can take a few minutes)...")
+    print(f"Evaluating {total} configurations (time depends on qubit count, shots and iterations)...")
 
     def progress(done: int, count: int, label: str) -> None:
         if done == count or done % 12 == 0:
@@ -99,8 +99,10 @@ def main() -> int:
 
     stem = f"{graph.name}_k{args.colors}_{args.noise_profile}_{args.backend}_seed{args.seed}"
     out = Path(args.output_dir)
-    print(f"Saved: {result.save_json(out / (stem + '.json'))}")
+    json_path = result.save_json(out / (stem + ".json"))
+    print(f"Saved: {json_path}")
     print(f"Saved: {result.save_csv(out / (stem + '.csv'))}")
+    print(f"Next:  python -m qaoa_tuner.recommendation {json_path}")
     return 0
 
 

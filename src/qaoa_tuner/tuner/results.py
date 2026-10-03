@@ -130,6 +130,26 @@ class TunerResult:
             "records": [r.to_dict() for r in self.records],
         }
 
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> TunerResult:
+        """Rebuild a result from ``to_dict`` output (derived fields are recomputed, not read)."""
+        return cls(
+            settings=data["settings"],
+            noise_profile=data["noise_profile"],
+            backend=data["backend"],
+            objectives=data["objectives"],
+            tolerance=data.get("tolerance", {}),
+            training=data.get("training", []),
+            records=[TunerRecord(**r) for r in data["records"]],
+            wall_time_seconds=data.get("wall_time_seconds", 0.0),
+            software=data.get("software", {}),
+        )
+
+    @classmethod
+    def load_json(cls, filepath: str | Path) -> TunerResult:
+        """Load a result previously written by ``save_json``."""
+        return cls.from_dict(json.loads(Path(filepath).read_text(encoding="utf-8")))
+
     def to_json(self, indent: int = 2) -> str:
         return json.dumps(self.to_dict(), indent=indent)
 
