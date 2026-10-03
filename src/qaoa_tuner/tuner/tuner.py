@@ -55,6 +55,11 @@ class ConfigurationTuner:
                 progress(i, len(configs), config.label)
 
         records = self._mark_pareto(records)
+        elapsed = time.perf_counter() - start
+        logger.info(
+            "Tuning finished: %d configurations, %d Pareto-efficient, %.1f s",
+            len(records), sum(r.is_pareto_optimal for r in records), elapsed,
+        )
         return TunerResult(
             settings=self.settings.to_dict(),
             noise_profile=evaluator.noise_cfg.to_dict(),
@@ -63,7 +68,7 @@ class ConfigurationTuner:
             tolerance=self.tolerance,
             training=evaluator.training_summary(),
             records=records,
-            wall_time_seconds=time.perf_counter() - start,
+            wall_time_seconds=elapsed,
             software={
                 "python": platform.python_version(),
                 "qiskit": qiskit.__version__,

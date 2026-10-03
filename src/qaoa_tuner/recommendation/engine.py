@@ -167,23 +167,31 @@ def _distinguishable(a: TunerRecord, b: TunerRecord) -> bool | None:
     return abs(a.valid_coloring_rate - b.valid_coloring_rate) > 2.0 * combined
 
 
-def _comparison_caveat(a: TunerRecord, b: TunerRecord, b_name: str) -> str | None:
-    if a.label == b.label:
-        return None
-    diff = a.valid_coloring_rate - b.valid_coloring_rate
-    verdict = _distinguishable(a, b)
-    if verdict is False:
-        return (
-            f"Valid-rate difference vs the {b_name} pick ({diff:+.3f}) is within 2 combined "
+def _comparison_caveats(rec: TunerRecord, pairs: list[tuple[TunerRecord, str]]) -> list[str]:
+    """Statistical caveats for the comparisons made; same-kind notes are merged into one line."""
+    untestable: list[str] = []
+    within_noise: list[str] = []
+    for other, name in pairs:
+        if other.label == rec.label:
+            continue
+        diff = rec.valid_coloring_rate - other.valid_coloring_rate
+        verdict = _distinguishable(rec, other)
+        if verdict is None:
+            untestable.append(f"the {name} pick ({diff:+.3f})")
+        elif verdict is False:
+            within_noise.append(f"the {name} pick ({diff:+.3f})")
+    notes = []
+    if untestable:
+        notes.append(
+            "No standard error is available for one of the rates (readout-mitigated results "
+            f"have none), so the valid-rate difference vs {' and '.join(untestable)} cannot be tested."
+        )
+    if within_noise:
+        notes.append(
+            f"Valid-rate difference vs {' and '.join(within_noise)} is within 2 combined "
             "standard errors: not statistically distinguishable at this shot count."
         )
-    if verdict is None:
-        return (
-            f"No standard error is available for one of the two rates (readout-mitigated "
-            f"results have none), so the difference vs the {b_name} pick ({diff:+.3f}) "
-            "cannot be tested."
-        )
-    return None
+    return notes
 
 
 def _mitigation_reason(r: TunerRecord, by_key: dict[tuple, TunerRecord]) -> str:
@@ -363,10 +371,7 @@ def recommend(
             pairs = [(low, "low-cost")]
         else:
             pairs = [(low, "low-cost"), (high, "high-quality")]
-        for other, name in pairs:
-            note = _comparison_caveat(rec, other, name)
-            if note:
-                caveats.append(note)
+        caveats.extend(_comparison_caveats(rec, pairs))
 
         same = [c for c, r in picks.items() if c != category and r.label == rec.label]
         return Recommendation(

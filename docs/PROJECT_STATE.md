@@ -22,7 +22,7 @@ Repo: github.com/emjayy13/QAOA-Tuner (branch `main`).
 
 Windows, PowerShell (NOT bash), VS Code, conda base. Python 3.13.9, Qiskit 2.2.3, Qiskit Aer
 0.17.2, Qiskit Algorithms 0.4.0, Qiskit Optimization 0.7.0, NetworkX 3.5, NumPy 2.3.5,
-SciPy 1.16.3, PyTest 8.4.2, Matplotlib 3.10.6. `pip install -e .` works. Package lives in
+SciPy 1.16.3, PyTest 8.4.2, Matplotlib 3.10.6. Streamlit is an optional extra: `pip install -e ".[dashboard]"`. `pip install -e .` works. Package lives in
 `src/qaoa_tuner`. Changes are delivered as zips mirroring the repo layout and applied with
 `Expand-Archive <zip> -DestinationPath . -Force`.
 
@@ -33,9 +33,9 @@ SciPy 1.16.3, PyTest 8.4.2, Matplotlib 3.10.6. `pip install -e .` works. Package
 | 0-5 | Plan, graph core, QAOA, experiment engine, transpilation, noise | done, committed |
 | 6 | Error mitigation (readout, ZNE) and comparison benchmark | done, tested, commit `phase-6` pending/confirm |
 | 7 | Tuner: 72-point grid, Pareto dominance, tie grouping, JSON/CSV | done, 115 tests passing; commit message `phase-7: add configuration tuner with Pareto analysis` |
-| 8 | Recommendation engine (low cost / balanced / high quality) | code delivered (`phase8_patch.zip`); owner must run `pytest -q` and the recommendation CLI, then commit `phase-8: add recommendation engine` |
-| 9 | Streamlit dashboard | not started |
-| 10 | Polish (README, logging, docs, screenshots) | not started |
+| 8 | Recommendation engine (low cost / balanced / high quality) | done, 133 tests passing; commit `phase-8: add recommendation engine` |
+| 9 | Streamlit dashboard | done, 154 tests passing, app verified by owner; commit `phase-9: add Streamlit dashboard` |
+| 10 | Polish (README, extras, Results page solution view, logging) | code delivered (`phase10_patch.zip`); owner must run `pytest -q`, test the Results page, add 4 screenshots to `docs/images/`, commit `phase-10: polish documentation, results view and packaging` |
 | 11 | Poster experiments (fixed suite, multi-seed, figures) | not started |
 | 12 | Portfolio packaging | not started |
 
@@ -43,15 +43,15 @@ Test count at last confirmed run: 115 passed (before phase 8).
 
 ## Immediate next steps (update after each action)
 
-1. Owner: apply `phase8_patch.zip`, run `pytest -q` (expect the earlier 115 plus new phase 8 tests),
-   run `python -m qaoa_tuner.tuner --graph c4 --colors 2` then
-   `python -m qaoa_tuner.recommendation data\tuner\<file>.json`, send back the output.
-2. If green: commit phase 8 and (optionally) decide on committing `data/` folders.
-3. Next phase: 9 (Streamlit dashboard). Before it: unify the tuner's execution path with the phase 3
-   engine (engine ignores `mitigation_method`), and decide how the dashboard loads saved results
-   (`TunerResult.load_json`, `recommend`, `format_report` already exist and are UI-independent).
-4. Optional before phase 11: per-scale simulator seeds for ZNE; check phase 4 `swaps_introduced`;
-   multi-seed aggregation for the poster.
+1. Owner: apply `phase10_patch.zip`, `pip install -e ".[dashboard]"`, `pytest -q`, run the dashboard,
+   run one circuit and check Results > Solution (colored graph, distribution). Save 4 screenshots to
+   `docs/images/`: dashboard_problem.png, dashboard_results.png (optional), dashboard_pareto.png,
+   dashboard_recommendations.png. Commit phase 10.
+2. Phase 11: poster experiments (fixed suite: few graphs, backends, several seeds; figures 1-6 from
+   the brief; report all results incl. contradicting ones). Suggested prerequisites: per-scale
+   simulator seeds for ZNE; fair SPSA budget; multi-seed aggregation script; check phase 4
+   `swaps_introduced` (needs `compilation/transpiler.py` source).
+3. Phase 12: portfolio packaging (resume bullets, interview explanation, demo GIF, final README pass).
 
 ## Module map (`src/qaoa_tuner`)
 
@@ -70,6 +70,8 @@ Test count at last confirmed run: 115 passed (before phase 8).
 - `recommendation/` (phase 8): engine.py (RecommendationSettings, recommend, format_report;
   pure Python, reads a TunerResult), `__main__.py` (CLI reading a saved tuner JSON).
   `TunerResult.from_dict/load_json` (tuner/results.py) load saved results.
+- `dashboard/` (phase 9): app.py (Streamlit pages only), service.py (graph building, validation,
+  run helpers; no Streamlit), charts.py (matplotlib figures, warm palette). Theme: `.streamlit/config.toml`.
 - `cli.py`: phase 3 experiment CLI
 
 ## How to run
@@ -79,6 +81,7 @@ pytest -q
 python -m qaoa_tuner.mitigation.benchmark --graph c4 --colors 2 --p 1 --plot
 python -m qaoa_tuner.tuner --graph c4 --colors 2            # writes data/tuner/*.json and *.csv
 python -m qaoa_tuner.recommendation data\tuner\<file>.json  # phase 8
+streamlit run src/qaoa_tuner/dashboard/app.py               # phase 9 (needs streamlit)
 ```
 
 ## Key design decisions (and why)
@@ -127,8 +130,7 @@ python -m qaoa_tuner.recommendation data\tuner\<file>.json  # phase 8
 - Frontier objective `quality_degradation` rewards circuits that never started high (e.g. low-
   quality p=1 SPSA); phase 8's quality floor handles this for recommendations.
 - Single-seed results can mislead; phase 11 should aggregate several seeds.
-- README is a stub (phase 10). Decide whether to commit `data/` result folders.
-- Tuner CLI said "this can take a few minutes" although a 4-qubit run takes seconds (fixed in phase 8).
+- README is written (phase 10); screenshots must be added by the owner. Decide whether to commit `data/` result folders.
 
 ## Working rules (from the project brief; keep following)
 

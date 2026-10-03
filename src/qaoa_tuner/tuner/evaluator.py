@@ -199,6 +199,17 @@ class ConfigurationEvaluator:
             for (p, opt), t in sorted(self._trained.items())
         ]
 
+    def counts_for(self, config: TunerConfig) -> dict[str, int] | None:
+        """Measured counts behind a configuration's estimate (None for ZNE: scalar estimate only)."""
+        base = self._compile_and_run(
+            config.qaoa_p, config.optimizer, config.optimization_level
+        ).decoded.counts
+        if config.mitigation == "none":
+            return dict(base)
+        if config.mitigation == "readout":
+            return self._readout_calibrator().mitigate_counts(base)
+        return None
+
     def evaluate(self, config: TunerConfig) -> TunerRecord:
         """Run one configuration and return its measured record."""
         s = self.settings
