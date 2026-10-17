@@ -71,9 +71,9 @@ streamlit run src/qaoa_tuner/dashboard/app.py
 
 Dashboard pages: Overview, Problem Setup, Configuration, Run, Results, Compare, Recommendations.
 
-[Pareto frontier]<img width="245" height="295" alt="image" src="https://github.com/user-attachments/assets/fac3dd48-fcd8-4143-9b27-95cef64a695b" />
+<img width="245" height="295" alt="image" src="https://github.com/user-attachments/assets/fac3dd48-fcd8-4143-9b27-95cef64a695b" />
 
-[Comparisons]<img width="299" height="313" alt="image" src="https://github.com/user-attachments/assets/b0f89a3c-8496-4d6c-8efb-a96c60786147" />
+<img width="299" height="313" alt="image" src="https://github.com/user-attachments/assets/b0f89a3c-8496-4d6c-8efb-a96c60786147" />
 
 
 ## Metrics
