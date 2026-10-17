@@ -10,8 +10,6 @@ It is an **engineering and experimental framework**. It does not claim a new QAO
 a new error-mitigation technique, a universally optimal configuration, or quantum advantage.
 Everything is simulated (Qiskit Aer); no real hardware was used.
 
-![Problem setup](docs/images/dashboard_problem.png)
-
 ## Motivation and question
 
 > Given a graph-coloring problem and a target backend, can we automatically identify QAOA
@@ -73,9 +71,10 @@ streamlit run src/qaoa_tuner/dashboard/app.py
 
 Dashboard pages: Overview, Problem Setup, Configuration, Run, Results, Compare, Recommendations.
 
-![Pareto frontier]<img width="245" height="295" alt="image" src="https://github.com/user-attachments/assets/fac3dd48-fcd8-4143-9b27-95cef64a695b" />
+[Pareto frontier]<img width="245" height="295" alt="image" src="https://github.com/user-attachments/assets/fac3dd48-fcd8-4143-9b27-95cef64a695b" />
 
-![Recommendations](docs/images/dashboard_recommendations.png)
+[Comparisons]<img width="299" height="313" alt="image" src="https://github.com/user-attachments/assets/b0f89a3c-8496-4d6c-8efb-a96c60786147" />
+
 
 ## Metrics
 
